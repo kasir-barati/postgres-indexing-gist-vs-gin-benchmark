@@ -1,39 +1,95 @@
 const path = require('path');
 
 require('dotenv').config({
-    path: path.join(__dirname, '..', '.env')
+  path: path.join(__dirname, '..', '.env'),
 });
+const sequelize = require('./models/sequelize');
+const Product = require('./models/product');
 
-const express = require('express');
+const lorem = [
+  'یک',
+  'ماژول',
+  'جاواسکریپت',
+  'برای',
+  'تولید',
+  'متن',
+  'لورم',
+  'ایپسوم',
+  'به',
+  'زبان',
+  'فارسی',
+  'است',
+  'لورم',
+  'ایپسوم',
+  'متنی',
+  'آزمایشی',
+  'و',
+  'بی',
+  'معنی',
+  'در',
+  'طراحی',
+  'می',
+  'باشد',
+  'که',
+  'طراح',
+  'گرافیک',
+  'از',
+  'این',
+  'متن',
+  'به',
+  'عنوان',
+  'عنصری',
+  'از',
+  'ترکیب',
+  'بندی',
+  'برای',
+  'پر',
+  'کردن',
+  'صفحه',
+  'و',
+  'ارایه',
+  'اولیه',
+  'شکل',
+  'ظاهری',
+  'و',
+  'کلی',
+  'طرح',
+  'سفارش',
+  'گرفته',
+  'شده',
+  'استفاده',
+  'می',
+  'نماید',
+];
 
-const Logger = require('./utils/logger');
-const logger = new Logger('initalize-app');
+function getRandom(arr, counter) {
+  let result = new Array(counter);
+  let arrLength = arr.length;
+  let taken = new Array(arrLength);
 
-require('./configs/unhandled-errors')(logger, require('./services/mail'));
+  if (counter > arrLength) {
+    throw new RangeError(
+      'getRandom: more elements taken than available',
+    );
+  }
 
-const app = express();
+  while (counter--) {
+    let x = Math.floor(Math.random() * arrLength);
+    result[counter] = arr[x in taken ? taken[x] : x];
+    taken[x] =
+      --arrLength in taken ? taken[arrLength] : arrLength;
+  }
 
-const NODE_ENV = process.env.NODE_ENV;
-const APP_PORT = process.env.APP_PORT;
-const APP_HOST = process.env.APP_HOST;
+  return result.join(' ');
+}
 
-app.use(require('cors')());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, '..', 'public')));
-
-app.use(require('./middlewares/logger'));
-app.use(require('./middlewares/404'));
-app.use(require('./middlewares/send-response'));
-app.use(require('./middlewares/500'));
-
-app.listen(APP_PORT, APP_HOST, error => {
-    if (error) throw error;
-    else {
-        require('./configs/mongodb').connect(logger);
-        require('./configs/sequelize').getSequelize().sync({ force: true })
-        logger.info(`Server is up & running on ${NODE_ENV} mode. http://${APP_HOST}:${APP_PORT}`)
-    };
-});
-
-module.exports = app;
+sequelize
+  .getSequelize()
+  .sync()
+  .then(() => {
+    for (let i = 0; i < 10000; i++) {
+      Product.create({
+        title: getRandom(lorem, 10),
+      });
+    }
+  });
