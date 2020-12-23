@@ -10,7 +10,13 @@ const DB_PORT1 = process.env.DB_PORT1;
 // const DB_PASS2 = process.env.DB_PASS2;
 // const DB_HOST2 = process.env.DB_HOST2;
 // const DB_PORT2 = process.env.DB_PORT2;
-
+console.log(
+  DB_NAME1,
+  DB_USER1,
+  DB_PASS1,
+  DB_HOST1,
+  DB_PORT1,
+);
 const _sequelize = new Sequelize({
   dialect: 'postgres',
   database: DB_NAME1,
